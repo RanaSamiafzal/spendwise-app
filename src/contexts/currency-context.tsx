@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-type Currency = 'USD' | 'EUR' | 'GBP' | 'JPY' | 'AUD' | 'CAD' | 'CHF' | 'CNY' | 'INR' | 'NZD' | 'RUB' | 'BRL' | 'ZAR' | 'AED' | 'HKD' | 'MXN' | 'SGD' | 'KRW';
+type Currency = 'USD' | 'EUR' | 'GBP' | 'JPY' | 'AUD' | 'CAD' | 'CHF' | 'CNY' | 'INR' | 'NZD' | 'RUB' | 'BRL' | 'ZAR' | 'AED' | 'HKD' | 'MXN' | 'SGD' | 'KRW' | 'PKR';
 
 interface CurrencyContextType {
   currency: Currency;
@@ -54,6 +54,7 @@ export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
     if (currency === 'MXN') locale = 'es-MX';
     if (currency === 'SGD') locale = 'en-SG';
     if (currency === 'KRW') locale = 'ko-KR';
+    if (currency === 'PKR') locale = 'ur-PK';
     
     return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(amount);
   };

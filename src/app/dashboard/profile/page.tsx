@@ -1,15 +1,42 @@
 'use client';
 
+import * as React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCurrency } from '@/contexts/currency-context';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+const currencies = [
+  { value: 'USD', label: 'USD - United States Dollar' },
+  { value: 'EUR', label: 'EUR - Euro' },
+  { value: 'GBP', label: 'GBP - British Pound' },
+  { value: 'JPY', label: 'JPY - Japanese Yen' },
+  { value: 'AUD', label: 'AUD - Australian Dollar' },
+  { value: 'CAD', label: 'CAD - Canadian Dollar' },
+  { value: 'CHF', label: 'CHF - Swiss Franc' },
+  { value: 'CNY', label: 'CNY - Chinese Yuan' },
+  { value: 'INR', label: 'INR - Indian Rupee' },
+  { value: 'NZD', label: 'NZD - New Zealand Dollar' },
+  { value: 'RUB', label: 'RUB - Russian Ruble' },
+  { value: 'BRL', label: 'BRL - Brazilian Real' },
+  { value: 'ZAR', label: 'ZAR - South African Rand' },
+  { value: 'AED', label: 'AED - UAE Dirham' },
+  { value: 'HKD', label: 'HKD - Hong Kong Dollar' },
+  { value: 'MXN', label: 'MXN - Mexican Peso' },
+  { value: 'SGD', label: 'SGD - Singapore Dollar' },
+  { value: 'KRW', label: 'KRW - South Korean Won' },
+  { value: 'PKR', label: 'PKR - Pakistani Rupee' },
+];
 
 export default function ProfilePage() {
   const { currency, setCurrency } = useCurrency();
+  const [open, setOpen] = React.useState(false);
 
   return (
     <div className="space-y-6">
@@ -45,31 +72,49 @@ export default function ProfilePage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="currency">Currency</Label>
-              <Select value={currency} onValueChange={(value) => setCurrency(value as any)}>
-                <SelectTrigger id="currency">
-                  <SelectValue placeholder="Select currency" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="USD">USD - United States Dollar</SelectItem>
-                  <SelectItem value="EUR">EUR - Euro</SelectItem>
-                  <SelectItem value="GBP">GBP - British Pound</SelectItem>
-                  <SelectItem value="JPY">JPY - Japanese Yen</SelectItem>
-                  <SelectItem value="AUD">AUD - Australian Dollar</SelectItem>
-                  <SelectItem value="CAD">CAD - Canadian Dollar</SelectItem>
-                  <SelectItem value="CHF">CHF - Swiss Franc</SelectItem>
-                  <SelectItem value="CNY">CNY - Chinese Yuan</SelectItem>
-                  <SelectItem value="INR">INR - Indian Rupee</SelectItem>
-                  <SelectItem value="NZD">NZD - New Zealand Dollar</SelectItem>
-                  <SelectItem value="RUB">RUB - Russian Ruble</SelectItem>
-                  <SelectItem value="BRL">BRL - Brazilian Real</SelectItem>
-                  <SelectItem value="ZAR">ZAR - South African Rand</SelectItem>
-                  <SelectItem value="AED">AED - UAE Dirham</SelectItem>
-                  <SelectItem value="HKD">HKD - Hong Kong Dollar</SelectItem>
-                  <SelectItem value="MXN">MXN - Mexican Peso</SelectItem>
-                  <SelectItem value="SGD">SGD - Singapore Dollar</SelectItem>
-                  <SelectItem value="KRW">KRW - South Korean Won</SelectItem>
-                </SelectContent>
-              </Select>
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="w-full justify-between"
+                  >
+                    {currency
+                      ? currencies.find((c) => c.value === currency)?.label
+                      : 'Select currency...'}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                  <Command>
+                    <CommandInput placeholder="Search currency..." />
+                    <CommandEmpty>No currency found.</CommandEmpty>
+                    <CommandGroup>
+                      <CommandList>
+                        {currencies.map((curr) => (
+                          <CommandItem
+                            key={curr.value}
+                            value={curr.label}
+                            onSelect={() => {
+                              setCurrency(curr.value as any);
+                              setOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                'mr-2 h-4 w-4',
+                                currency === curr.value ? 'opacity-100' : 'opacity-0'
+                              )}
+                            />
+                            {curr.label}
+                          </CommandItem>
+                        ))}
+                      </CommandList>
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
           <div className="pt-2">
