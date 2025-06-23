@@ -9,7 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { CircleUser, Menu } from 'lucide-react';
 import Link from 'next/link';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Sidebar } from '../layout/sidebar';
 
 export function Header() {
@@ -27,6 +27,8 @@ export function Header() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="flex flex-col p-0 w-[280px]">
+            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+            <SheetDescription className="sr-only">The main navigation menu for the application.</SheetDescription>
             <Sidebar />
           </SheetContent>
         </Sheet>
