@@ -10,6 +10,8 @@ import { SpendingInsights } from '@/components/dashboard/spending-insights';
 import { AddTransaction } from '@/components/dashboard/add-transaction';
 import { mockAccounts, mockTransactions, mockBudgets } from '@/lib/data';
 import type { Transaction, Budget, Account, Category } from '@/lib/types';
+import { MonthlySummary } from '@/components/dashboard/monthly-summary';
+import { DailyReminder } from '@/components/dashboard/daily-reminder';
 
 export default function DashboardPage() {
   const [accounts, setAccounts] = useState<Account[]>(mockAccounts);
@@ -71,6 +73,8 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        <MonthlySummary transactions={transactions} />
+
         <BalanceOverview accounts={accounts} />
 
         <div className="grid gap-6 lg:grid-cols-5">
@@ -86,8 +90,9 @@ export default function DashboardPage() {
           <div className="lg:col-span-3">
             <RecentTransactions transactions={transactions} />
           </div>
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
             <SpendingInsights transactions={transactions} budgets={budgets} />
+            <DailyReminder />
           </div>
         </div>
       </main>
