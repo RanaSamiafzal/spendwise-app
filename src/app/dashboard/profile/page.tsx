@@ -54,6 +54,20 @@ export default function ProfilePage() {
                   <SelectItem value="EUR">EUR - Euro</SelectItem>
                   <SelectItem value="GBP">GBP - British Pound</SelectItem>
                   <SelectItem value="JPY">JPY - Japanese Yen</SelectItem>
+                  <SelectItem value="AUD">AUD - Australian Dollar</SelectItem>
+                  <SelectItem value="CAD">CAD - Canadian Dollar</SelectItem>
+                  <SelectItem value="CHF">CHF - Swiss Franc</SelectItem>
+                  <SelectItem value="CNY">CNY - Chinese Yuan</SelectItem>
+                  <SelectItem value="INR">INR - Indian Rupee</SelectItem>
+                  <SelectItem value="NZD">NZD - New Zealand Dollar</SelectItem>
+                  <SelectItem value="RUB">RUB - Russian Ruble</SelectItem>
+                  <SelectItem value="BRL">BRL - Brazilian Real</SelectItem>
+                  <SelectItem value="ZAR">ZAR - South African Rand</SelectItem>
+                  <SelectItem value="AED">AED - UAE Dirham</SelectItem>
+                  <SelectItem value="HKD">HKD - Hong Kong Dollar</SelectItem>
+                  <SelectItem value="MXN">MXN - Mexican Peso</SelectItem>
+                  <SelectItem value="SGD">SGD - Singapore Dollar</SelectItem>
+                  <SelectItem value="KRW">KRW - South Korean Won</SelectItem>
                 </SelectContent>
               </Select>
             </div>

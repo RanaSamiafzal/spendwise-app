@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-type Currency = 'USD' | 'EUR' | 'GBP' | 'JPY';
+type Currency = 'USD' | 'EUR' | 'GBP' | 'JPY' | 'AUD' | 'CAD' | 'CHF' | 'CNY' | 'INR' | 'NZD' | 'RUB' | 'BRL' | 'ZAR' | 'AED' | 'HKD' | 'MXN' | 'SGD' | 'KRW';
 
 interface CurrencyContextType {
   currency: Currency;
@@ -40,6 +40,20 @@ export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
     if (currency === 'EUR') locale = 'de-DE';
     if (currency === 'GBP') locale = 'en-GB';
     if (currency === 'JPY') locale = 'ja-JP';
+    if (currency === 'AUD') locale = 'en-AU';
+    if (currency === 'CAD') locale = 'en-CA';
+    if (currency === 'CHF') locale = 'de-CH';
+    if (currency === 'CNY') locale = 'zh-CN';
+    if (currency === 'INR') locale = 'en-IN';
+    if (currency === 'NZD') locale = 'en-NZ';
+    if (currency === 'RUB') locale = 'ru-RU';
+    if (currency === 'BRL') locale = 'pt-BR';
+    if (currency === 'ZAR') locale = 'en-ZA';
+    if (currency === 'AED') locale = 'ar-AE';
+    if (currency === 'HKD') locale = 'zh-HK';
+    if (currency === 'MXN') locale = 'es-MX';
+    if (currency === 'SGD') locale = 'en-SG';
+    if (currency === 'KRW') locale = 'ko-KR';
     
     return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(amount);
   };
