@@ -9,16 +9,24 @@ import { BudgetGoals } from '@/components/dashboard/budget-goals';
 import { SpendingInsights } from '@/components/dashboard/spending-insights';
 import { AddTransaction } from '@/components/dashboard/add-transaction';
 import { mockAccounts, mockTransactions, mockBudgets } from '@/lib/data';
-import type { Transaction, Budget, Account } from '@/lib/types';
+import type { Transaction, Budget, Account, Category } from '@/lib/types';
 
 export default function DashboardPage() {
   const [accounts, setAccounts] = useState<Account[]>(mockAccounts);
   const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
   const [budgets, setBudgets] = useState<Budget[]>(mockBudgets);
 
-  const allCategories = Array.from(
-    new Set(mockTransactions.filter(t => t.type === 'expense').map((t) => t.category).concat(mockBudgets.map((b) => b.category)))
-  ) as (Transaction['category'])[];
+  const [categories, setCategories] = useState<Category[]>(() => {
+    const expenseCats = mockTransactions.filter(t => t.type === 'expense').map((t) => t.category);
+    const budgetCats = mockBudgets.map((b) => b.category);
+    return Array.from(new Set([...expenseCats, ...budgetCats]));
+  });
+
+  const handleAddCategory = (newCategory: Category) => {
+    if (newCategory && !categories.includes(newCategory)) {
+        setCategories((prev) => [...prev, newCategory].sort());
+    }
+  };
 
   const handleAddTransaction = (newTransaction: Omit<Transaction, 'id' | 'date'>) => {
     const transactionWithIdAndDate: Transaction = {
@@ -55,7 +63,11 @@ export default function DashboardPage() {
             <p className="text-muted-foreground">Welcome back! Here's your financial overview.</p>
           </div>
           <div className="flex items-center space-x-2">
-            <AddTransaction onAddTransaction={handleAddTransaction} categories={allCategories} />
+            <AddTransaction 
+              onAddTransaction={handleAddTransaction} 
+              categories={categories}
+              onAddCategory={handleAddCategory} 
+            />
           </div>
         </div>
 

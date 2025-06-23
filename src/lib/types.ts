@@ -1,4 +1,4 @@
-export type Category = 'Groceries' | 'Rent' | 'Entertainment' | 'Transport' | 'Salary' | 'Utilities' | 'Other';
+export type Category = string;
 
 export interface Transaction {
   id: string;
