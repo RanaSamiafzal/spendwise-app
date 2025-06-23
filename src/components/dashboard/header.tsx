@@ -7,14 +7,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { CircleUser, Menu } from 'lucide-react';
+import { CircleUser, Menu, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Sidebar } from '../layout/sidebar';
 
 export function Header() {
   return (
-    <header className="flex h-14 items-center gap-4 border-b bg-background px-4 lg:h-[60px] lg:px-6">
+    <header className="relative flex h-14 items-center justify-between border-b bg-background px-4 lg:h-[60px] lg:px-6">
         <Sheet>
           <SheetTrigger asChild>
             <Button
@@ -33,8 +33,11 @@ export function Header() {
           </SheetContent>
         </Sheet>
         
-        <div className="w-full flex-1">
-          {/* Optional: Add a search bar here later */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
+            <Wallet className="h-6 w-6 text-primary" />
+            <span className="text-primary font-headline text-xl">SpendWise</span>
+          </Link>
         </div>
 
         <DropdownMenu>
