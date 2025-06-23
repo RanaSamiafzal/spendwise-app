@@ -1,3 +1,5 @@
+'use client';
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -5,12 +7,14 @@ import type { Transaction } from '@/lib/types';
 import { ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '../ui/scroll-area';
+import { useCurrency } from '@/contexts/currency-context';
 
 interface RecentTransactionsProps {
   transactions: Transaction[];
 }
 
 export function RecentTransactions({ transactions }: RecentTransactionsProps) {
+  const { formatCurrency } = useCurrency();
   return (
     <Card>
       <CardHeader>
@@ -50,7 +54,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
                     )}
                   >
                     {txn.type === 'income' ? <ArrowUpCircle size={16} /> : <ArrowDownCircle size={16} />}
-                    <span>{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(txn.amount)}</span>
+                    <span>{formatCurrency(txn.amount)}</span>
                   </TableCell>
                 </TableRow>
               ))}

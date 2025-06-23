@@ -1,7 +1,10 @@
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import type { Budget, Transaction } from '@/lib/types';
 import { ScrollArea } from '../ui/scroll-area';
+import { useCurrency } from '@/contexts/currency-context';
 
 interface BudgetGoalsProps {
   budgets: Budget[];
@@ -9,6 +12,8 @@ interface BudgetGoalsProps {
 }
 
 export function BudgetGoals({ budgets, transactions }: BudgetGoalsProps) {
+  const { formatCurrency } = useCurrency();
+
   const getSpentAmount = (category: string) => {
     return transactions
       .filter((t) => t.type === 'expense' && t.category === category)
@@ -33,9 +38,9 @@ export function BudgetGoals({ budgets, transactions }: BudgetGoalsProps) {
                     <span className="font-medium">{budget.category}</span>
                     <span className="text-muted-foreground">
                       <span className={progress > 100 ? 'text-destructive font-bold' : ''}>
-                        {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(spent)}
+                        {formatCurrency(spent)}
                       </span>{' '}
-                      / {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(budget.limit)}
+                      / {formatCurrency(budget.limit)}
                     </span>
                   </div>
                   <Progress value={progress} className={progress > 100 ? '[&>div]:bg-destructive' : ''} />

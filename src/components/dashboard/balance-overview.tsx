@@ -1,7 +1,10 @@
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Banknote, Landmark, CreditCard } from 'lucide-react';
 import type { Account } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { useCurrency } from '@/contexts/currency-context';
 
 interface BalanceOverviewProps {
   accounts: Account[];
@@ -14,6 +17,8 @@ const iconMap = {
 };
 
 export function BalanceOverview({ accounts }: BalanceOverviewProps) {
+  const { formatCurrency } = useCurrency();
+
   return (
     <div className="grid gap-6 md:grid-cols-3">
       {accounts.map((account) => (
@@ -29,7 +34,7 @@ export function BalanceOverview({ accounts }: BalanceOverviewProps) {
                 account.balance >= 0 ? 'text-foreground' : 'text-destructive'
               )}
             >
-              {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(account.balance)}
+              {formatCurrency(account.balance)}
             </div>
             <p className="text-xs text-muted-foreground">Current Balance</p>
           </CardContent>

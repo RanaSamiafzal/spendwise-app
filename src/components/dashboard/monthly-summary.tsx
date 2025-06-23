@@ -5,6 +5,7 @@ import { ArrowUpCircle, ArrowDownCircle, PiggyBank } from 'lucide-react';
 import type { Transaction } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
+import { useCurrency } from '@/contexts/currency-context';
 
 interface MonthlySummaryProps {
   transactions: Transaction[];
@@ -18,6 +19,7 @@ interface MonthlyStats {
 }
 
 export function MonthlySummary({ transactions }: MonthlySummaryProps) {
+  const { formatCurrency } = useCurrency();
   const [stats, setStats] = useState<MonthlyStats>({
     income: 0,
     expenses: 0,
@@ -53,10 +55,6 @@ export function MonthlySummary({ transactions }: MonthlySummaryProps) {
     });
 
   }, [transactions]);
-
-
-  const formatCurrency = (amount: number) => 
-    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
 
   return (
     <div className="grid gap-6 md:grid-cols-3">

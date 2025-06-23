@@ -18,6 +18,7 @@ import {
 import type { Transaction } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { useCurrency } from '@/contexts/currency-context';
 
 interface MonthlyRecordsTableProps {
   transactions: Transaction[];
@@ -32,6 +33,8 @@ interface MonthlyData {
 }
 
 export function MonthlyRecordsTable({ transactions }: MonthlyRecordsTableProps) {
+  const { formatCurrency } = useCurrency();
+
   const monthlyData = useMemo(() => {
     const groupedData: Record<string, MonthlyData> = {};
 
@@ -62,9 +65,6 @@ export function MonthlyRecordsTable({ transactions }: MonthlyRecordsTableProps) 
     
     return Object.values(groupedData).sort((a,b) => new Date(b.transactions[0].date).getTime() - new Date(a.transactions[0].date).getTime());
   }, [transactions]);
-
-  const formatCurrency = (amount: number) =>
-    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
 
   return (
     <Card>
