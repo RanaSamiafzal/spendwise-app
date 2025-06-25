@@ -14,13 +14,13 @@ import { Sidebar } from '../layout/sidebar';
 
 export function Header() {
   return (
-    <header className="relative flex h-14 items-center justify-between border-b bg-background px-4 lg:h-[60px] lg:px-6">
+    <header className="relative flex h-14 items-center justify-between border-b bg-primary px-4 text-primary-foreground lg:h-[60px] lg:px-6">
         <Sheet>
           <SheetTrigger asChild>
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon"
-              className="shrink-0"
+              className="shrink-0 hover:bg-white/20"
             >
               <Menu className="h-5 w-5" />
               <span className="sr-only">Toggle navigation menu</span>
@@ -35,14 +35,14 @@ export function Header() {
         
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-            <Wallet className="h-6 w-6 text-primary" />
-            <span className="text-primary font-headline text-xl">SpendWise</span>
+            <Wallet className="h-6 w-6" />
+            <span className="font-headline text-xl">SpendWise</span>
           </Link>
         </div>
 
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-            <Button variant="secondary" size="icon" className="rounded-full">
+            <Button variant="ghost" size="icon" className="rounded-full hover:bg-white/20">
                 <CircleUser className="h-5 w-5" />
                 <span className="sr-only">Toggle user menu</span>
             </Button>

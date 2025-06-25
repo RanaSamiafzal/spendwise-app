@@ -2,21 +2,21 @@ import Link from 'next/link';
 
 export function Footer() {
   return (
-    <footer className="border-t bg-background">
+    <footer className="border-t bg-primary text-primary-foreground">
       <div className="container mx-auto py-6 px-4 md:px-8">
-        <div className="flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
+        <div className="flex flex-col md:flex-row justify-between items-center text-sm opacity-80">
           <p>&copy; {new Date().getFullYear()} SpendWise. All rights reserved.</p>
           <nav className="flex gap-4 sm:gap-6 mt-4 md:mt-0">
-            <Link href="#" className="hover:text-primary transition-colors">
+            <Link href="#" className="hover:underline">
               Support
             </Link>
-            <Link href="#" className="hover:text-primary transition-colors">
+            <Link href="#" className="hover:underline">
               Contact Us
             </Link>
-            <Link href="#" className="hover:text-primary transition-colors">
+            <Link href="#" className="hover:underline">
               Privacy Policy
             </Link>
-            <Link href="#" className="hover:text-primary transition-colors">
+            <Link href="#" className="hover:underline">
               Terms of Service
             </Link>
           </nav>
