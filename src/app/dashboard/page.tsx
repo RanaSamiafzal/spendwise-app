@@ -28,7 +28,7 @@ export default function DashboardPage() {
   const [categories, setCategories] = useState<Category[]>(() => {
     const expenseCats = mockTransactions.filter(t => t.type === 'expense').map((t) => t.category);
     const budgetCats = mockBudgets.map((b) => b.category);
-    return Array.from(new Set([...expenseCats, ...budgetCats, 'Uncategorized']));
+    return Array.from(new Set([...expenseCats, ...budgetCats, 'Uncategorized', 'Salary']));
   });
 
   const handleAddCategory = (newCategory: Category) => {
