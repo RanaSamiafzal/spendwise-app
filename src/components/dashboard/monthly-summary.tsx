@@ -83,16 +83,18 @@ export function MonthlySummary({ transactions }: MonthlySummaryProps) {
                 </CardContent>
             </Card>
         </Link>
-        <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-sm font-medium">Monthly Savings</CardTitle>
-                <PiggyBank className="w-6 h-6 text-primary" />
-            </CardHeader>
-            <CardContent>
-                <div className={cn("text-2xl font-bold", stats.savings >= 0 ? 'text-foreground' : 'text-destructive')}>{formatCurrency(stats.savings)}</div>
-                <p className="text-xs text-muted-foreground">For {stats.month}</p>
-            </CardContent>
-        </Card>
+        <Link href="/dashboard/records" className="block rounded-lg transition-all hover:shadow-lg hover:ring-2 hover:ring-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+            <Card className="h-full">
+                <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                    <CardTitle className="text-sm font-medium">Monthly Savings</CardTitle>
+                    <PiggyBank className="w-6 h-6 text-primary" />
+                </CardHeader>
+                <CardContent>
+                    <div className={cn("text-2xl font-bold", stats.savings >= 0 ? 'text-foreground' : 'text-destructive')}>{formatCurrency(stats.savings)}</div>
+                    <p className="text-xs text-muted-foreground">For {stats.month}</p>
+                </CardContent>
+            </Card>
+        </Link>
     </div>
   );
 }
