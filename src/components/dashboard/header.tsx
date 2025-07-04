@@ -18,7 +18,7 @@ interface HeaderProps {
 
 export function Header({ onOpenSupportChat }: HeaderProps) {
   return (
-    <header className="relative flex h-14 items-center justify-between border-b bg-primary px-4 text-primary-foreground lg:h-[60px] lg:px-6">
+    <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b bg-primary px-4 text-primary-foreground lg:h-[60px] lg:px-6">
         <Sheet>
           <SheetTrigger asChild>
             <Button
