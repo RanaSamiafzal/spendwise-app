@@ -4,16 +4,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Wallet } from 'lucide-react';
 
 export default function SignupPage() {
     const router = useRouter();
+    const { toast } = useToast();
 
     const handleSignup = (e: React.FormEvent) => {
         e.preventDefault();
-        alert('Signup successful! Please check your email for verification. You can now log in.');
+        toast({
+            title: "Signup Successful",
+            description: "You can now log in with your new account.",
+        });
         router.push('/login');
     };
 

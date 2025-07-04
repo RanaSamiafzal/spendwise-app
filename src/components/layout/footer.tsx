@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import { InfoDialog } from './info-dialog';
-import { SupportChat } from './support-chat';
 
-export function Footer() {
+interface FooterProps {
+  onOpenSupportChat: () => void;
+}
+
+export function Footer({ onOpenSupportChat }: FooterProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState({ title: '', content: '' });
-  const [supportChatOpen, setSupportChatOpen] = useState(false);
 
   const showInfoDialog = (title: string, content: string) => {
     setDialogContent({ title, content });
@@ -64,7 +66,7 @@ In no event shall SpendWise, nor its directors, employees, partners, agents, sup
             <p>&copy; {new Date().getFullYear()} SpendWise. All rights reserved.</p>
             <nav className="flex gap-4 sm:gap-6 mt-4 md:mt-0">
               <button
-                onClick={() => setSupportChatOpen(true)}
+                onClick={onOpenSupportChat}
                 className="hover:underline bg-transparent border-none p-0 cursor-pointer text-primary-foreground"
               >
                 Support
@@ -98,8 +100,6 @@ In no event shall SpendWise, nor its directors, employees, partners, agents, sup
         title={dialogContent.title}
         content={dialogContent.content}
       />
-      
-      <SupportChat open={supportChatOpen} onOpenChange={setSupportChatOpen} />
     </>
   );
 }

@@ -12,7 +12,11 @@ import Link from 'next/link';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Sidebar } from '../layout/sidebar';
 
-export function Header() {
+interface HeaderProps {
+  onOpenSupportChat: () => void;
+}
+
+export function Header({ onOpenSupportChat }: HeaderProps) {
   return (
     <header className="relative flex h-14 items-center justify-between border-b bg-primary px-4 text-primary-foreground lg:h-[60px] lg:px-6">
         <Sheet>
@@ -29,7 +33,7 @@ export function Header() {
           <SheetContent side="left" className="flex flex-col p-0 w-[280px]">
             <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
             <SheetDescription className="sr-only">The main navigation menu for the application.</SheetDescription>
-            <Sidebar />
+            <Sidebar onOpenSupportChat={onOpenSupportChat} />
           </SheetContent>
         </Sheet>
         
@@ -51,7 +55,7 @@ export function Header() {
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild><Link href="/dashboard/profile">Profile</Link></DropdownMenuItem>
-            <DropdownMenuItem>Support</DropdownMenuItem>
+            <DropdownMenuItem onSelect={onOpenSupportChat}>Support</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild><Link href="/login">Logout</Link></DropdownMenuItem>
             </DropdownMenuContent>

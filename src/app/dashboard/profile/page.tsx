@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 const currencies = [
   { value: 'USD', label: 'USD - United States Dollar' },
@@ -37,6 +38,20 @@ const currencies = [
 export default function ProfilePage() {
   const { currency, setCurrency } = useCurrency();
   const [open, setOpen] = React.useState(false);
+  const { toast } = useToast();
+
+  const [username, setUsername] = React.useState('demo_user');
+  const [email, setEmail] = React.useState('demo@example.com');
+  const [phone, setPhone] = React.useState('123-456-7890');
+
+  const handleSaveChanges = (e: React.FormEvent) => {
+    e.preventDefault();
+    // In a real app, you would save these details to your backend.
+    toast({
+      title: 'Profile Updated',
+      description: 'Your changes have been successfully saved.',
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -49,77 +64,80 @@ export default function ProfilePage() {
           <CardTitle>Your Information</CardTitle>
           <CardDescription>Update your personal details here.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center space-x-4">
-            <Avatar className="h-20 w-20">
-              <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="person avatar" />
-              <AvatarFallback>DU</AvatarFallback>
-            </Avatar>
-            <Button variant="outline">Change Photo</Button>
-          </div>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input id="username" defaultValue="demo_user" />
+        <CardContent>
+          <form onSubmit={handleSaveChanges} className="space-y-4">
+            <div className="flex items-center space-x-4">
+              <Avatar className="h-20 w-20">
+                <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="person avatar" />
+                <AvatarFallback>DU</AvatarFallback>
+              </Avatar>
+              <Button variant="outline" type="button">Change Photo</Button>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" defaultValue="demo@example.com" />
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="username">Username</Label>
+                <Input id="username" value={username} onChange={(e) => setUsername(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="currency">Currency</Label>
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={open}
+                      className="w-full justify-between"
+                      type="button"
+                    >
+                      {currency
+                        ? currencies.find((c) => c.value === currency)?.label
+                        : 'Select currency...'}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                    <Command>
+                      <CommandInput placeholder="Search currency..." />
+                      <CommandEmpty>No currency found.</CommandEmpty>
+                      <CommandGroup>
+                        <CommandList>
+                          {currencies.map((curr) => (
+                            <CommandItem
+                              key={curr.value}
+                              value={curr.label}
+                              onSelect={() => {
+                                setCurrency(curr.value as any);
+                                setOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  'mr-2 h-4 w-4',
+                                  currency === curr.value ? 'opacity-100' : 'opacity-0'
+                                )}
+                              />
+                              {curr.label}
+                            </CommandItem>
+                          ))}
+                        </CommandList>
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input id="phone" type="tel" defaultValue="123-456-7890" />
+            <div className="pt-2">
+              <Button type="submit">Save Changes</Button>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="currency">Currency</Label>
-              <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={open}
-                    className="w-full justify-between"
-                  >
-                    {currency
-                      ? currencies.find((c) => c.value === currency)?.label
-                      : 'Select currency...'}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                  <Command>
-                    <CommandInput placeholder="Search currency..." />
-                    <CommandEmpty>No currency found.</CommandEmpty>
-                    <CommandGroup>
-                      <CommandList>
-                        {currencies.map((curr) => (
-                          <CommandItem
-                            key={curr.value}
-                            value={curr.label}
-                            onSelect={() => {
-                              setCurrency(curr.value as any);
-                              setOpen(false);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                'mr-2 h-4 w-4',
-                                currency === curr.value ? 'opacity-100' : 'opacity-0'
-                              )}
-                            />
-                            {curr.label}
-                          </CommandItem>
-                        ))}
-                      </CommandList>
-                    </CommandGroup>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
-          <div className="pt-2">
-            <Button>Save Changes</Button>
-          </div>
+          </form>
         </CardContent>
       </Card>
     </div>
