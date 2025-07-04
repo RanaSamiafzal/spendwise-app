@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { BalanceOverview } from '@/components/dashboard/balance-overview';
 import { RecentTransactions } from '@/components/dashboard/recent-transactions';
 import { SpendingChart } from '@/components/dashboard/spending-chart';
@@ -70,23 +71,33 @@ export default function DashboardPage() {
 
       <MonthlySummary transactions={transactions} />
 
-      <BalanceOverview accounts={accounts} />
+      <Link href="/dashboard/accounts" className="block rounded-lg transition-all hover:shadow-lg hover:ring-2 hover:ring-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+        <BalanceOverview accounts={accounts} />
+      </Link>
 
       <div className="grid gap-6 lg:grid-cols-5">
         <div className="lg:col-span-3">
-          <BudgetGoals budgets={budgets} transactions={transactions} />
+          <Link href="/dashboard/budgets" className="block h-full rounded-lg transition-all hover:shadow-lg hover:ring-2 hover:ring-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+            <BudgetGoals budgets={budgets} transactions={transactions} />
+          </Link>
         </div>
         <div className="lg:col-span-2">
-          <SpendingChart transactions={transactions} />
+           <Link href="/dashboard/analysis" className="block h-full rounded-lg transition-all hover:shadow-lg hover:ring-2 hover:ring-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+            <SpendingChart transactions={transactions} />
+          </Link>
         </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-5">
         <div className="lg:col-span-3">
-          <RecentTransactions transactions={transactions} />
+          <Link href="/dashboard/records" className="block h-full rounded-lg transition-all hover:shadow-lg hover:ring-2 hover:ring-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+            <RecentTransactions transactions={transactions} />
+          </Link>
         </div>
         <div className="lg:col-span-2 space-y-6">
-          <SpendingInsights transactions={transactions} budgets={budgets} />
+           <Link href="/dashboard/analysis" className="block rounded-lg transition-all hover:shadow-lg hover:ring-2 hover:ring-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+            <SpendingInsights transactions={transactions} budgets={budgets} />
+          </Link>
           <DailyReminder />
         </div>
       </div>

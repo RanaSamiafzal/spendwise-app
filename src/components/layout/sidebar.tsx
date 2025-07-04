@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, FileText, User } from 'lucide-react';
+import { Home, FileText, User, Landmark, Target, BarChart2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Card,
@@ -19,6 +19,9 @@ export function Sidebar() {
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
     { href: '/dashboard/records', label: 'Monthly Records', icon: FileText },
+    { href: '/dashboard/accounts', label: 'Accounts', icon: Landmark },
+    { href: '/dashboard/budgets', label: 'Budgets', icon: Target },
+    { href: '/dashboard/analysis', label: 'Analysis', icon: BarChart2 },
     { href: '/dashboard/profile', label: 'Profile', icon: User },
   ];
 
