@@ -10,13 +10,13 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const SuggestCategoryInputSchema = z.object({
+const SuggestCategoryInputSchema = z.object({
   description: z.string().describe('The transaction description.'),
   categories: z.array(z.string()).describe('The list of available categories to choose from.'),
 });
 export type SuggestCategoryInput = z.infer<typeof SuggestCategoryInputSchema>;
 
-export const SuggestCategoryOutputSchema = z.object({
+const SuggestCategoryOutputSchema = z.object({
   category: z.string().describe('The suggested category from the provided list. Should be an empty string if no category is a good fit.'),
 });
 export type SuggestCategoryOutput = z.infer<typeof SuggestCategoryOutputSchema>;
