@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -17,9 +17,10 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import type { Transaction, Category } from '@/lib/types';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast"
 import { Separator } from '@/components/ui/separator';
+import { suggestCategory } from '@/ai/flows/suggest-category';
 
 interface AddTransactionProps {
   onAddTransaction: (transaction: Omit<Transaction, 'id' | 'date'>) => void;
@@ -35,15 +36,52 @@ export function AddTransaction({ onAddTransaction, categories, onAddCategory }: 
   const [open, setOpen] = useState(false);
   const [isAddCategoryDialogOpen, setAddCategoryDialogOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [isSuggesting, setIsSuggesting] = useState(false);
+  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     if (type === 'income') {
       setCategory('Salary');
+      if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+      setIsSuggesting(false);
     } else {
       setCategory('');
     }
   }, [type]);
+
+  useEffect(() => {
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+
+    if (description.trim().length > 2 && type === 'expense') {
+      setIsSuggesting(true);
+      debounceTimeout.current = setTimeout(async () => {
+        try {
+          const result = await suggestCategory({
+            description,
+            categories: categories.filter(c => c.toLowerCase() !== 'salary'),
+          });
+          if (result.category && categories.includes(result.category)) {
+            setCategory(result.category);
+          }
+        } catch (error) {
+          console.error("Failed to suggest category:", error);
+        } finally {
+          setIsSuggesting(false);
+        }
+      }, 1000); 
+    } else {
+      setIsSuggesting(false);
+    }
+    
+    return () => {
+        if (debounceTimeout.current) {
+            clearTimeout(debounceTimeout.current);
+        }
+    }
+  }, [description, categories, type]);
 
   const handleCategoryChange = (value: string) => {
     if (value === 'add_new_category') {
@@ -156,8 +194,9 @@ export function AddTransaction({ onAddTransaction, categories, onAddCategory }: 
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="category" className="text-right">
+                <Label htmlFor="category" className="text-right flex items-center justify-end gap-2">
                   Category
+                  {isSuggesting && <Loader2 className="h-4 w-4 animate-spin" />}
                 </Label>
                 <div className="col-span-3">
                   <Select onValueChange={handleCategoryChange} value={category} disabled={type === 'income'}>
