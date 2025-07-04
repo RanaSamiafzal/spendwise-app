@@ -18,8 +18,7 @@ const iconMap = {
 };
 
 export default function AccountDetailPage() {
-  const params = useParams();
-  const { accountId } = params;
+  const { accountId } = useParams();
   const { formatCurrency } = useCurrency();
 
   // In a real app, you'd fetch this data.

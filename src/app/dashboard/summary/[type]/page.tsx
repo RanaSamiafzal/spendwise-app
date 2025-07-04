@@ -13,8 +13,7 @@ import { format } from 'date-fns';
 import { useMemo } from 'react';
 
 export default function SummaryDetailPage() {
-  const params = useParams();
-  const { type } = params;
+  const { type } = useParams();
   const { formatCurrency } = useCurrency();
 
   const isIncome = type === 'income';
@@ -72,7 +71,7 @@ export default function SummaryDetailPage() {
                 {isIncome ? <ArrowUpCircle className="w-6 h-6 text-emerald-500" /> : <ArrowDownCircle className="w-6 h-6 text-destructive" />}
                 Total {isIncome ? 'Income' : 'Expenses'} this month
             </CardTitle>
-        </CardHeader>
+        </Header>
         <CardContent>
              <div className={cn('text-4xl font-bold', isIncome ? 'text-emerald-500' : 'text-destructive')}>
                 {formatCurrency(total)}
