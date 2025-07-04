@@ -71,7 +71,7 @@ export default function SummaryDetailPage() {
                 {isIncome ? <ArrowUpCircle className="w-6 h-6 text-emerald-500" /> : <ArrowDownCircle className="w-6 h-6 text-destructive" />}
                 Total {isIncome ? 'Income' : 'Expenses'} this month
             </CardTitle>
-        </Header>
+        </CardHeader>
         <CardContent>
              <div className={cn('text-4xl font-bold', isIncome ? 'text-emerald-500' : 'text-destructive')}>
                 {formatCurrency(total)}
