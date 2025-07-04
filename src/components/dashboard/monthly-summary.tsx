@@ -6,6 +6,7 @@ import type { Transaction } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { useCurrency } from '@/contexts/currency-context';
+import Link from 'next/link';
 
 interface MonthlySummaryProps {
   transactions: Transaction[];
@@ -58,26 +59,30 @@ export function MonthlySummary({ transactions }: MonthlySummaryProps) {
 
   return (
     <div className="grid gap-6 md:grid-cols-3">
-        <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-sm font-medium">Monthly Income</CardTitle>
-                <ArrowUpCircle className="w-6 h-6 text-emerald-500" />
-            </CardHeader>
-            <CardContent>
-                <div className="text-2xl font-bold text-emerald-500">{formatCurrency(stats.income)}</div>
-                <p className="text-xs text-muted-foreground">For {stats.month}</p>
-            </CardContent>
-        </Card>
-        <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-sm font-medium">Monthly Expenses</CardTitle>
-                <ArrowDownCircle className="w-6 h-6 text-destructive" />
-            </CardHeader>
-            <CardContent>
-                <div className="text-2xl font-bold text-destructive">{formatCurrency(stats.expenses)}</div>
-                <p className="text-xs text-muted-foreground">For {stats.month}</p>
-            </CardContent>
-        </Card>
+        <Link href="/dashboard/summary/income" className="block rounded-lg transition-all hover:shadow-lg hover:ring-2 hover:ring-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+            <Card className="h-full">
+                <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                    <CardTitle className="text-sm font-medium">Monthly Income</CardTitle>
+                    <ArrowUpCircle className="w-6 h-6 text-emerald-500" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold text-emerald-500">{formatCurrency(stats.income)}</div>
+                    <p className="text-xs text-muted-foreground">For {stats.month}</p>
+                </CardContent>
+            </Card>
+        </Link>
+        <Link href="/dashboard/summary/expenses" className="block rounded-lg transition-all hover:shadow-lg hover:ring-2 hover:ring-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+            <Card className="h-full">
+                <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                    <CardTitle className="text-sm font-medium">Monthly Expenses</CardTitle>
+                    <ArrowDownCircle className="w-6 h-6 text-destructive" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold text-destructive">{formatCurrency(stats.expenses)}</div>
+                    <p className="text-xs text-muted-foreground">For {stats.month}</p>
+                </CardContent>
+            </Card>
+        </Link>
         <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                 <CardTitle className="text-sm font-medium">Monthly Savings</CardTitle>

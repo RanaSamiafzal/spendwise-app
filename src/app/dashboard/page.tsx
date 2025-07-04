@@ -71,9 +71,7 @@ export default function DashboardPage() {
 
       <MonthlySummary transactions={transactions} />
 
-      <Link href="/dashboard/accounts" className="block rounded-lg transition-all hover:shadow-lg hover:ring-2 hover:ring-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-        <BalanceOverview accounts={accounts} />
-      </Link>
+      <BalanceOverview accounts={accounts} />
 
       <div className="grid gap-6 lg:grid-cols-5">
         <div className="lg:col-span-3">
