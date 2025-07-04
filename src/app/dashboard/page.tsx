@@ -12,11 +12,18 @@ import { mockAccounts, mockTransactions, mockBudgets } from '@/lib/data';
 import type { Transaction, Budget, Account, Category } from '@/lib/types';
 import { MonthlySummary } from '@/components/dashboard/monthly-summary';
 import { DailyReminder } from '@/components/dashboard/daily-reminder';
+import { Button } from '@/components/ui/button';
+import { Loader2, RefreshCw } from 'lucide-react';
+import { clarifyTransaction } from '@/ai/flows/clarify-transaction';
+import { suggestCategory } from '@/ai/flows/suggest-category';
+import { useToast } from '@/hooks/use-toast';
 
 export default function DashboardPage() {
   const [accounts, setAccounts] = useState<Account[]>(mockAccounts);
   const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
   const [budgets, setBudgets] = useState<Budget[]>(mockBudgets);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const { toast } = useToast();
 
   const [categories, setCategories] = useState<Category[]>(() => {
     const expenseCats = mockTransactions.filter(t => t.type === 'expense').map((t) => t.category);
@@ -53,6 +60,64 @@ export default function DashboardPage() {
     );
   };
 
+  const handleSyncTransactions = async () => {
+    setIsSyncing(true);
+    try {
+      const newSyncedTransactions = [
+        { crypticDescription: 'Vending Machine', amount: 3.25 },
+        { crypticDescription: 'TFL.GOV.UK/CP', amount: 12.80 },
+        { crypticDescription: 'AMZN Mktp US', amount: 42.99 },
+      ];
+
+      const processedTransactions: Transaction[] = [];
+      let totalSyncedExpenses = 0;
+
+      for (const syncedTxn of newSyncedTransactions) {
+        const [clarifiedResult, categoryResult] = await Promise.all([
+          clarifyTransaction({ description: syncedTxn.crypticDescription }),
+          suggestCategory({ description: syncedTxn.crypticDescription, categories }),
+        ]);
+        
+        const newTransaction: Transaction = {
+          id: `sync_${Date.now()}_${Math.random()}`,
+          date: new Date().toISOString().split('T')[0],
+          description: clarifiedResult.clarifiedDescription,
+          category: categoryResult.category || 'Uncategorized',
+          amount: syncedTxn.amount,
+          type: 'expense',
+        };
+        processedTransactions.push(newTransaction);
+        totalSyncedExpenses += newTransaction.amount;
+      }
+      
+      setTransactions((prev) => [...processedTransactions, ...prev]);
+      setAccounts((prevAccounts) =>
+        prevAccounts.map((acc) => {
+          if (acc.type === 'checking') {
+            return { ...acc, balance: acc.balance - totalSyncedExpenses };
+          }
+          return acc;
+        })
+      );
+
+      toast({
+        title: "Sync Complete",
+        description: `${processedTransactions.length} new transactions were added.`,
+      });
+
+    } catch (error) {
+      console.error("Failed to sync transactions:", error);
+      toast({
+        title: "Sync Failed",
+        description: "Could not sync transactions. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between space-y-2">
@@ -61,6 +126,14 @@ export default function DashboardPage() {
           <p className="text-muted-foreground">Welcome back! Here's your financial overview.</p>
         </div>
         <div className="flex items-center space-x-2">
+          <Button variant="outline" onClick={handleSyncTransactions} disabled={isSyncing}>
+            {isSyncing ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="mr-2 h-4 w-4" />
+            )}
+            Sync with Bank
+          </Button>
           <AddTransaction 
             onAddTransaction={handleAddTransaction} 
             categories={categories}
@@ -87,7 +160,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-5">
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-3 h-full">
           <Link href="/dashboard/records" className="block h-full rounded-lg transition-all hover:shadow-lg hover:ring-2 hover:ring-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
             <RecentTransactions transactions={transactions} />
           </Link>
