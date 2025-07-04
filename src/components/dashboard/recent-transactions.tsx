@@ -16,13 +16,13 @@ interface RecentTransactionsProps {
 export function RecentTransactions({ transactions }: RecentTransactionsProps) {
   const { formatCurrency } = useCurrency();
   return (
-    <Card>
+    <Card className="h-full flex flex-col">
       <CardHeader>
         <CardTitle>Recent Transactions</CardTitle>
         <CardDescription>A list of your most recent income and expenses.</CardDescription>
       </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[350px]">
+      <CardContent className="flex-1 overflow-hidden">
+        <ScrollArea className="h-full">
           <Table>
             <TableHeader>
               <TableRow>
