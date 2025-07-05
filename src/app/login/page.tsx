@@ -17,8 +17,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
-      <Card className="mx-auto max-w-sm">
+    <div className="flex items-center justify-center min-h-screen bg-background p-4">
+      <Card className="mx-auto max-w-sm w-full">
         <CardHeader>
           <div className="flex items-center justify-center gap-2 mb-4">
              <Wallet className="w-8 h-8 text-primary" />

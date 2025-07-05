@@ -40,7 +40,7 @@ export function Header({ onOpenSupportChat }: HeaderProps) {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
             <Wallet className="h-6 w-6" />
-            <span className="font-headline text-xl">SpendWise</span>
+            <span className="font-headline text-xl hidden sm:inline">SpendWise</span>
           </Link>
         </div>
 

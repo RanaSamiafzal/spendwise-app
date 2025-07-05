@@ -77,9 +77,9 @@ export function MonthlyRecordsTable({ transactions }: MonthlyRecordsTableProps) 
           {monthlyData.map((data) => (
             <AccordionItem value={data.month} key={data.month}>
               <AccordionTrigger>
-                <div className="flex justify-between w-full pr-4 text-lg">
+                <div className="flex flex-col items-start text-left sm:flex-row sm:items-center sm:justify-between w-full pr-4 text-lg">
                   <span>{data.month}</span>
-                  <div className="flex gap-8">
+                  <div className="flex gap-4 sm:gap-8 text-sm sm:text-lg mt-1 sm:mt-0">
                      <span className="text-emerald-500">{formatCurrency(data.income)}</span>
                      <span className="text-destructive">{formatCurrency(data.expenses)}</span>
                      <span className={cn(data.savings >= 0 ? 'text-foreground' : 'text-destructive')}>
@@ -89,34 +89,36 @@ export function MonthlyRecordsTable({ transactions }: MonthlyRecordsTableProps) 
                 </div>
               </AccordionTrigger>
               <AccordionContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead className="text-right">Amount</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {data.transactions.map((txn) => (
-                      <TableRow key={txn.id}>
-                        <TableCell>{format(new Date(txn.date), 'MMM dd, yyyy')}</TableCell>
-                        <TableCell>{txn.description}</TableCell>
-                        <TableCell>{txn.category}</TableCell>
-                        <TableCell
-                          className={cn(
-                            'text-right font-medium',
-                            txn.type === 'income' ? 'text-emerald-600' : 'text-destructive'
-                          )}
-                        >
-                          {txn.type === 'expense' ? '-' : ''}
-                          {formatCurrency(txn.amount)}
-                        </TableCell>
+                <div className="relative w-full overflow-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead className="text-right">Amount</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {data.transactions.map((txn) => (
+                        <TableRow key={txn.id}>
+                          <TableCell className="whitespace-nowrap">{format(new Date(txn.date), 'MMM dd, yyyy')}</TableCell>
+                          <TableCell>{txn.description}</TableCell>
+                          <TableCell>{txn.category}</TableCell>
+                          <TableCell
+                            className={cn(
+                              'text-right font-medium whitespace-nowrap',
+                              txn.type === 'income' ? 'text-emerald-600' : 'text-destructive'
+                            )}
+                          >
+                            {txn.type === 'expense' ? '-' : ''}
+                            {formatCurrency(txn.amount)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </AccordionContent>
             </AccordionItem>
           ))}

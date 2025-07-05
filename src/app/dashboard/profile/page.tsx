@@ -66,7 +66,7 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSaveChanges} className="space-y-4">
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
               <Avatar className="h-20 w-20">
                 <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="person avatar" />
                 <AvatarFallback>DU</AvatarFallback>

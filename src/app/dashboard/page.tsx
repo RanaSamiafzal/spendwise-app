@@ -120,13 +120,13 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between space-y-2">
+      <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-headline">Dashboard</h1>
           <p className="text-muted-foreground">Welcome back! Here's your financial overview.</p>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" onClick={handleSyncTransactions} disabled={isSyncing}>
+        <div className="flex w-full sm:w-auto items-center space-x-2">
+          <Button variant="outline" onClick={handleSyncTransactions} disabled={isSyncing} className="w-full sm:w-auto">
             {isSyncing ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
