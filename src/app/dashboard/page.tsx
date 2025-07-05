@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { BalanceOverview } from '@/components/dashboard/balance-overview';
 import { RecentTransactions } from '@/components/dashboard/recent-transactions';
@@ -31,13 +31,13 @@ export default function DashboardPage() {
     return Array.from(new Set([...expenseCats, ...budgetCats, 'Uncategorized', 'Salary']));
   });
 
-  const handleAddCategory = (newCategory: Category) => {
+  const handleAddCategory = useCallback((newCategory: Category) => {
     if (newCategory && !categories.includes(newCategory)) {
         setCategories((prev) => [...prev, newCategory].sort());
     }
-  };
+  }, [categories]);
 
-  const handleAddTransaction = (newTransaction: Omit<Transaction, 'id' | 'date'>) => {
+  const handleAddTransaction = useCallback((newTransaction: Omit<Transaction, 'id' | 'date'>) => {
     const transactionWithIdAndDate: Transaction = {
       ...newTransaction,
       id: `txn_${Date.now()}`,
@@ -58,9 +58,9 @@ export default function DashboardPage() {
         return acc;
       })
     );
-  };
+  }, []);
 
-  const handleSyncTransactions = async () => {
+  const handleSyncTransactions = useCallback(async () => {
     setIsSyncing(true);
     try {
       const newSyncedTransactions = [
@@ -115,7 +115,7 @@ export default function DashboardPage() {
     } finally {
       setIsSyncing(false);
     }
-  };
+  }, [categories, toast]);
 
 
   return (

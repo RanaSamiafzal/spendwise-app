@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import type { Budget, Transaction } from '@/lib/types';
@@ -14,10 +15,19 @@ interface BudgetGoalsProps {
 export function BudgetGoals({ budgets, transactions }: BudgetGoalsProps) {
   const { formatCurrency } = useCurrency();
 
+  const spentAmounts = useMemo(() => {
+    const amounts = new Map<string, number>();
+    for (const transaction of transactions) {
+      if (transaction.type === 'expense') {
+        const currentAmount = amounts.get(transaction.category) || 0;
+        amounts.set(transaction.category, currentAmount + transaction.amount);
+      }
+    }
+    return amounts;
+  }, [transactions]);
+
   const getSpentAmount = (category: string) => {
-    return transactions
-      .filter((t) => t.type === 'expense' && t.category === category)
-      .reduce((sum, t) => sum + t.amount, 0);
+    return spentAmounts.get(category) || 0;
   };
 
   return (
