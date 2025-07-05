@@ -61,14 +61,14 @@ export function SpendingInsights({ transactions, budgets }: SpendingInsightsProp
           )}
         </Button>
         {insights && (
-          <ScrollArea className="h-[234px] w-full">
+          <ScrollArea className="h-[200px] sm:h-[234px] w-full">
             <div className="p-4 bg-secondary rounded-lg text-sm text-secondary-foreground">
               <p style={{ whiteSpace: 'pre-wrap' }}>{insights}</p>
             </div>
           </ScrollArea>
         )}
         {!insights && !isLoading && (
-            <div className="h-[234px] flex items-center justify-center text-center text-muted-foreground p-4 bg-secondary rounded-lg">
+            <div className="h-[200px] sm:h-[234px] flex items-center justify-center text-center text-muted-foreground p-4 bg-secondary rounded-lg">
                 Click "Generate Insights" to get an AI-powered summary of your spending and tips for saving money.
             </div>
         )}

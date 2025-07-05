@@ -27,7 +27,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
             <TableHeader>
               <TableRow>
                 <TableHead>Description</TableHead>
-                <TableHead>Category</TableHead>
+                <TableHead className="hidden sm:table-cell">Category</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
               </TableRow>
             </TableHeader>
@@ -44,7 +44,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
                       })}
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="hidden sm:table-cell">
                     <Badge variant="outline">{txn.category}</Badge>
                   </TableCell>
                   <TableCell
