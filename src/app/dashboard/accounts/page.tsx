@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Banknote, Landmark, CreditCard } from 'lucide-react';
 import { mockAccounts } from '@/lib/data';
@@ -20,13 +20,13 @@ export default function AccountsPage() {
   const [accounts, setAccounts] = useState<Account[]>(mockAccounts);
   const { formatCurrency } = useCurrency();
 
-  const handleAddAccount = (newAccount: Omit<Account, 'id'>) => {
+  const handleAddAccount = useCallback((newAccount: Omit<Account, 'id'>) => {
     const accountWithId: Account = {
         ...newAccount,
         id: `acc_${Date.now()}`
     };
     setAccounts((prev) => [...prev, accountWithId]);
-  };
+  }, []);
 
   return (
     <div className="space-y-6">

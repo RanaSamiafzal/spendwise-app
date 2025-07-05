@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowUpCircle, ArrowDownCircle, PiggyBank } from 'lucide-react';
 import type { Transaction } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { useCurrency } from '@/contexts/currency-context';
 import Link from 'next/link';
 
@@ -12,23 +12,10 @@ interface MonthlySummaryProps {
   transactions: Transaction[];
 }
 
-interface MonthlyStats {
-  income: number;
-  expenses: number;
-  savings: number;
-  month: string;
-}
-
 export function MonthlySummary({ transactions }: MonthlySummaryProps) {
   const { formatCurrency } = useCurrency();
-  const [stats, setStats] = useState<MonthlyStats>({
-    income: 0,
-    expenses: 0,
-    savings: 0,
-    month: '',
-  });
-
-  useEffect(() => {
+  
+  const stats = useMemo(() => {
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
@@ -48,13 +35,12 @@ export function MonthlySummary({ transactions }: MonthlySummaryProps) {
 
     const savings = income - expenses;
     
-    setStats({
+    return {
       income,
       expenses,
       savings,
       month: now.toLocaleString('default', { month: 'long' })
-    });
-
+    };
   }, [transactions]);
 
   return (
