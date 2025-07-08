@@ -2,21 +2,30 @@
 
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { BalanceOverview } from '@/components/dashboard/balance-overview';
 import { RecentTransactions } from '@/components/dashboard/recent-transactions';
 import { SpendingChart } from '@/components/dashboard/spending-chart';
 import { BudgetGoals } from '@/components/dashboard/budget-goals';
-import { SpendingInsights } from '@/components/dashboard/spending-insights';
 import { AddTransaction } from '@/components/dashboard/add-transaction';
 import { mockAccounts, mockTransactions, mockBudgets } from '@/lib/data';
 import type { Transaction, Budget, Account, Category } from '@/lib/types';
 import { MonthlySummary } from '@/components/dashboard/monthly-summary';
-import { DailyReminder } from '@/components/dashboard/daily-reminder';
 import { Button } from '@/components/ui/button';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { clarifyTransaction } from '@/ai/flows/clarify-transaction';
 import { suggestCategory } from '@/ai/flows/suggest-category';
 import { useToast } from '@/hooks/use-toast';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const SpendingInsights = dynamic(() => import('@/components/dashboard/spending-insights').then((mod) => mod.SpendingInsights), {
+  loading: () => <Skeleton className="h-[320px] w-full" />,
+});
+
+const DailyReminder = dynamic(() => import('@/components/dashboard/daily-reminder').then((mod) => mod.DailyReminder), {
+  loading: () => <Skeleton className="h-[230px] w-full" />,
+});
+
 
 export default function DashboardPage() {
   const [accounts, setAccounts] = useState<Account[]>(mockAccounts);

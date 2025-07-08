@@ -1,11 +1,26 @@
 import type { Metadata } from "next";
+import { Inter, PT_Sans } from 'next/font/google';
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "SpendWise",
   description: "Budgeting and expense tracking made simple",
 };
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+const ptSans = PT_Sans({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  display: 'swap',
+  variable: '--font-pt-sans',
+});
 
 export default function RootLayout({
   children,
@@ -14,13 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
-      </head>
-      <body className="font-body antialiased">
+      <body className={cn('font-body antialiased', inter.variable, ptSans.variable)}>
         {children}
         <Toaster />
       </body>
