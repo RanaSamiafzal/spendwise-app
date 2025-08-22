@@ -37,11 +37,11 @@ This application is a feature-rich prototype built with a modern web stack. It u
 
 ## Deployment
 
-You can deploy this application using Vercel (recommended for ease-of-use) or Firebase App Hosting.
+You have two excellent options for deploying this application. Vercel is highly recommended for its simplicity and generous free tier that does not require a credit card.
 
 ### Option 1: Deploying with Vercel (Recommended)
 
-Vercel is the creator of Next.js and offers a seamless deployment experience with a generous free tier that does not require a credit card.
+Vercel is the creator of Next.js and offers a seamless deployment experience.
 
 1.  **Push your code to a Git repository** (e.g., on GitHub, GitLab, or Bitbucket).
 2.  **Sign up for Vercel**: Go to [vercel.com](https://vercel.com) and create a free account.
