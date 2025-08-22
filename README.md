@@ -20,7 +20,7 @@ This application is a feature-rich prototype built with a modern web stack. It u
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **AI Integration**: [Genkit (Google)](https://firebase.google.com/docs/genkit)
 - **Icons**: [Lucide React](https://lucide.dev/)
-- **Deployment**: [Firebase App Hosting](https://firebase.google.com/docs/app-hosting)
+- **Deployment**: [Vercel](https://vercel.com/) or [Firebase App Hosting](httpss://firebase.google.com/docs/app-hosting)
 
 ## Getting Started
 
@@ -35,32 +35,29 @@ This application is a feature-rich prototype built with a modern web stack. It u
     ```
     The application will be available at `http://localhost:9002`.
 
-## Deployment to Firebase App Hosting
+## Deployment
 
-This application is configured for easy deployment with **Firebase App Hosting**. Follow these steps from your terminal in the project's root directory.
+You can deploy this application using Vercel (recommended for ease-of-use) or Firebase App Hosting.
 
-1.  **Create a Firebase Project**
-    If you don't have one, create a new project in the [Firebase Console](https://console.firebase.google.com/).
+### Option 1: Deploying with Vercel (Recommended)
 
-2.  **Install Firebase CLI**
-    Make sure you have the Firebase Command Line Interface installed globally.
-    ```bash
-    npm install -g firebase-tools
-    ```
+Vercel is the creator of Next.js and offers a seamless deployment experience with a generous free tier that does not require a credit card.
 
-3.  **Login to Firebase**
-    ```bash
-    firebase login
-    ```
+1.  **Push your code to a Git repository** (e.g., on GitHub, GitLab, or Bitbucket).
+2.  **Sign up for Vercel**: Go to [vercel.com](https://vercel.com) and create a free account.
+3.  **Import Project**: From the Vercel dashboard, click "Add New... > Project" and import your Git repository.
+4.  **Deploy**: Vercel will automatically detect the Next.js framework and configure the build settings. Simply click the "Deploy" button.
 
-4.  **Initialize App Hosting**
-    Run the initialization command and follow the prompts to connect it to your Firebase project.
-    ```bash
-    firebase init apphosting
-    ```
+Vercel will handle the rest and provide you with a public URL for your live application.
 
-5.  **Deploy the App**
-    ```bash
-    firebase apphosting:backends:deploy
-    ```
-    After a few moments, the CLI will provide you with a URL to your live application.
+### Option 2: Deploying with Firebase App Hosting
+
+This project is also configured for deployment with Firebase App Hosting. Note that this requires setting up a Firebase project and may require a billing account.
+
+1.  **Create a Firebase Project**: If you don't have one, create a new project in the [Firebase Console](https://console.firebase.google.com/).
+2.  **Install Firebase CLI**: If you haven't already, install the command-line tools: `npm install -g firebase-tools`.
+3.  **Login to Firebase**: `firebase login`
+4.  **Initialize App Hosting**: Run `firebase init apphosting` and follow the prompts to connect it to your Firebase project.
+5.  **Deploy the App**: `firebase apphosting:backends:deploy`
+
+After a few moments, the CLI will provide you with a URL to your live application.
