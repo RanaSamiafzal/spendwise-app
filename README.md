@@ -35,24 +35,31 @@ This application is a feature-rich prototype built with a modern web stack. It u
     ```
     The application will be available at `http://localhost:9002`.
 
-## Deployment
+## Deployment to Firebase App Hosting
 
-This application is configured for easy deployment with **Firebase App Hosting**.
+This application is configured for easy deployment with **Firebase App Hosting**. Follow these steps from your terminal in the project's root directory.
 
-1.  **Create a Firebase Project**: If you don't have one, create a new project in the [Firebase Console](https://console.firebase.google.com/).
-2.  **Install Firebase CLI**: Make sure you have the Firebase Command Line Interface installed globally.
+1.  **Create a Firebase Project**
+    If you don't have one, create a new project in the [Firebase Console](https://console.firebase.google.com/).
+
+2.  **Install Firebase CLI**
+    Make sure you have the Firebase Command Line Interface installed globally.
     ```bash
     npm install -g firebase-tools
     ```
-3.  **Login to Firebase**:
+
+3.  **Login to Firebase**
     ```bash
     firebase login
     ```
-4.  **Initialize App Hosting**: In your project's root directory, run the initialization command and follow the prompts to connect it to your Firebase project.
+
+4.  **Initialize App Hosting**
+    Run the initialization command and follow the prompts to connect it to your Firebase project.
     ```bash
     firebase init apphosting
     ```
-5.  **Deploy the App**:
+
+5.  **Deploy the App**
     ```bash
     firebase apphosting:backends:deploy
     ```
