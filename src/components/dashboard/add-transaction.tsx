@@ -20,7 +20,6 @@ import type { Transaction, Category } from '@/lib/types';
 import { PlusCircle, Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast"
 import { Separator } from '@/components/ui/separator';
-import { suggestCategory } from '@/ai/flows/suggest-category';
 
 interface AddTransactionProps {
   onAddTransaction: (transaction: Omit<Transaction, 'id' | 'date'>) => void;
@@ -57,30 +56,29 @@ export function AddTransaction({ onAddTransaction, categories, onAddCategory }: 
 
     if (description.trim().length > 2 && type === 'expense') {
       setIsSuggesting(true);
-      debounceTimeout.current = setTimeout(async () => {
-        try {
-          const result = await suggestCategory({
-            description,
-            categories: categories.filter(c => c.toLowerCase() !== 'salary'),
-          });
-          if (result.category && categories.includes(result.category)) {
-            setCategory(result.category);
-          }
-        } catch (error) {
-          console.error("Failed to suggest category:", error);
-        } finally {
-          setIsSuggesting(false);
+      debounceTimeout.current = setTimeout(() => {
+        const lowered = description.toLowerCase();
+        const match = categories.find((cat) => lowered.includes(cat.toLowerCase()));
+        if (match) {
+          setCategory(match);
+        } else if (lowered.includes('uber') || lowered.includes('taxi') || lowered.includes('fuel')) {
+          const transport = categories.find((cat) => cat.toLowerCase().includes('transport'));
+          if (transport) setCategory(transport);
+        } else if (lowered.includes('coffee') || lowered.includes('restaurant') || lowered.includes('food')) {
+          const food = categories.find((cat) => cat.toLowerCase().includes('food'));
+          if (food) setCategory(food);
         }
-      }, 1000); 
+        setIsSuggesting(false);
+      }, 500);
     } else {
       setIsSuggesting(false);
     }
-    
+
     return () => {
-        if (debounceTimeout.current) {
-            clearTimeout(debounceTimeout.current);
-        }
-    }
+      if (debounceTimeout.current) {
+        clearTimeout(debounceTimeout.current);
+      }
+    };
   }, [description, categories, type]);
 
   const handleCategoryChange = (value: string) => {
