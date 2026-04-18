@@ -8,21 +8,19 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Wallet } from 'lucide-react';
 import { useState } from 'react';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { login } from '@/store/slices/auth-slice';
+import { useAuthSession } from '@/components/providers/redux-provider';
 
 export default function LoginPage() {
   const router = useRouter();
-  const dispatch = useAppDispatch();
-  const auth = useAppSelector((state) => state.auth);
+  const auth = useAuthSession();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = await dispatch(login({ email, password }));
-    if (login.fulfilled.match(result)) {
-      localStorage.setItem('spendwise_auth', JSON.stringify(result.payload));
+    const result = await auth.login({ email, password });
+    if (result) {
+      localStorage.setItem('spendwise_auth', JSON.stringify(result));
       router.push('/dashboard');
     }
   };

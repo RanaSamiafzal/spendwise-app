@@ -8,13 +8,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Wallet } from 'lucide-react';
 import { useState } from 'react';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { signup } from '@/store/slices/auth-slice';
+import { useAuthSession } from '@/components/providers/redux-provider';
 
 export default function SignupPage() {
   const router = useRouter();
-  const dispatch = useAppDispatch();
-  const auth = useAppSelector((state) => state.auth);
+  const auth = useAuthSession();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -22,9 +20,9 @@ export default function SignupPage() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = await dispatch(signup({ name, email, phone, password }));
-    if (signup.fulfilled.match(result)) {
-      localStorage.setItem('spendwise_auth', JSON.stringify(result.payload));
+    const result = await auth.signup({ name, email, phone, password });
+    if (result) {
+      localStorage.setItem('spendwise_auth', JSON.stringify(result));
       router.push('/dashboard');
     }
   };

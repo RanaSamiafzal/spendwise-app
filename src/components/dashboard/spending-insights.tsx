@@ -4,9 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Wand2, Loader2 } from 'lucide-react';
-import { analyzeSpendingHabits } from '@/ai/flows/analyze-spending-habits';
 import type { Transaction, Budget } from '@/lib/types';
-import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '../ui/scroll-area';
 
 interface SpendingInsightsProps {
@@ -17,34 +15,46 @@ interface SpendingInsightsProps {
 export function SpendingInsights({ transactions, budgets }: SpendingInsightsProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [insights, setInsights] = useState('');
-  const { toast } = useToast();
 
   const handleAnalyze = async () => {
     setIsLoading(true);
     setInsights('');
-    try {
-      const result = await analyzeSpendingHabits({
-        transactions: JSON.stringify(transactions),
-        budgetGoals: JSON.stringify(budgets.map((b) => ({ category: b.category, targetAmount: b.limit }))),
-      });
-      setInsights(result.insights);
-    } catch (error) {
-      console.error('Error analyzing spending habits:', error);
-      toast({
-        title: 'Error Generating Insights',
-        description: 'Failed to get insights from the AI. Please try again later.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
+
+    const expenseByCategory = transactions
+      .filter((t) => t.type === 'expense')
+      .reduce<Record<string, number>>((acc, tx) => {
+        acc[tx.category] = (acc[tx.category] || 0) + tx.amount;
+        return acc;
+      }, {});
+
+    const topCategories = Object.entries(expenseByCategory)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([category, amount]) => `• ${category}: $${amount.toFixed(2)}`)
+      .join('\n');
+
+    const budgetFeedback = budgets
+      .map((budget) => {
+        const spent = expenseByCategory[budget.category] || 0;
+        const delta = budget.limit - spent;
+        if (delta >= 0) return `• ${budget.category}: $${delta.toFixed(2)} under budget.`;
+        return `• ${budget.category}: $${Math.abs(delta).toFixed(2)} over budget.`;
+      })
+      .join('\n');
+
+    const recommendation =
+      'Recommendations:\n• Set a weekly cap for top expense category.\n• Review non-essential subscriptions this week.\n• Automate savings transfer after payday.';
+
+    await new Promise((resolve) => setTimeout(resolve, 450));
+    setInsights(`Top spending categories:\n${topCategories || '• No expense data yet.'}\n\nBudget status:\n${budgetFeedback}\n\n${recommendation}`);
+    setIsLoading(false);
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>AI Spending Insights</CardTitle>
-        <CardDescription>Get AI-powered analysis of your spending habits.</CardDescription>
+        <CardTitle>Spending Insights</CardTitle>
+        <CardDescription>Instant analysis generated from your current dashboard data.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <Button onClick={handleAnalyze} disabled={isLoading} className="w-full">
@@ -60,17 +70,18 @@ export function SpendingInsights({ transactions, budgets }: SpendingInsightsProp
             </>
           )}
         </Button>
-        {insights && (
-          <ScrollArea className="h-[200px] sm:h-[234px] w-full">
-            <div className="p-4 bg-secondary rounded-lg text-sm text-secondary-foreground">
+        {insights ? (
+          <ScrollArea className="h-[200px] w-full sm:h-[234px]">
+            <div className="rounded-lg bg-secondary p-4 text-sm text-secondary-foreground">
               <p style={{ whiteSpace: 'pre-wrap' }}>{insights}</p>
             </div>
           </ScrollArea>
-        )}
-        {!insights && !isLoading && (
-            <div className="h-[200px] sm:h-[234px] flex items-center justify-center text-center text-muted-foreground p-4 bg-secondary rounded-lg">
-                Click "Generate Insights" to get an AI-powered summary of your spending and tips for saving money.
+        ) : (
+          !isLoading && (
+            <div className="flex h-[200px] items-center justify-center rounded-lg bg-secondary p-4 text-center text-muted-foreground sm:h-[234px]">
+              Click "Generate Insights" to get a practical summary of spending and budget performance.
             </div>
+          )
         )}
       </CardContent>
     </Card>
