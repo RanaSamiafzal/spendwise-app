@@ -1,186 +1,198 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import Link from 'next/link';
-import dynamic from 'next/dynamic';
-import { BalanceOverview } from '@/components/dashboard/balance-overview';
-import { RecentTransactions } from '@/components/dashboard/recent-transactions';
-import { SpendingChart } from '@/components/dashboard/spending-chart';
-import { BudgetGoals } from '@/components/dashboard/budget-goals';
-import { AddTransaction } from '@/components/dashboard/add-transaction';
-import { mockAccounts, mockTransactions, mockBudgets } from '@/lib/data';
-import type { Transaction, Budget, Account, Category } from '@/lib/types';
-import { MonthlySummary } from '@/components/dashboard/monthly-summary';
+import { useEffect, useMemo, useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, RefreshCw } from 'lucide-react';
-import { clarifyTransaction } from '@/ai/flows/clarify-transaction';
-import { suggestCategory } from '@/ai/flows/suggest-category';
-import { useToast } from '@/hooks/use-toast';
-import { Skeleton } from '@/components/ui/skeleton';
-
-const SpendingInsights = dynamic(() => import('@/components/dashboard/spending-insights').then((mod) => mod.SpendingInsights), {
-  loading: () => <Skeleton className="h-[320px] w-full" />,
-});
-
-const DailyReminder = dynamic(() => import('@/components/dashboard/daily-reminder').then((mod) => mod.DailyReminder), {
-  loading: () => <Skeleton className="h-[230px] w-full" />,
-});
-
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { hydrateAuth } from '@/store/slices/auth-slice';
+import { createTransaction, fetchTransactions } from '@/store/slices/transactions-slice';
+import { createSubscription, fetchSubscriptionInsights, fetchSubscriptions } from '@/store/slices/subscriptions-slice';
+import { addUserMessage, fetchAdvice, sendChatMessage } from '@/store/slices/ai-slice';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardPage() {
-  const [accounts, setAccounts] = useState<Account[]>(mockAccounts);
-  const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
-  const [budgets, setBudgets] = useState<Budget[]>(mockBudgets);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const { toast } = useToast();
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const auth = useAppSelector((state) => state.auth);
+  const transactions = useAppSelector((state) => state.transactions.items);
+  const subscriptions = useAppSelector((state) => state.subscriptions.items);
+  const monthlyBurn = useAppSelector((state) => state.subscriptions.monthlyBurn);
+  const ai = useAppSelector((state) => state.ai);
 
-  const [categories, setCategories] = useState<Category[]>(() => {
-    const expenseCats = mockTransactions.filter(t => t.type === 'expense').map((t) => t.category);
-    const budgetCats = mockBudgets.map((b) => b.category);
-    return Array.from(new Set([...expenseCats, ...budgetCats, 'Uncategorized', 'Salary']));
-  });
+  const [txForm, setTxForm] = useState({ description: '', category: 'General', amount: 0, type: 'expense' as 'income' | 'expense' });
+  const [subForm, setSubForm] = useState({ name: '', amount: 0, billingCycle: 'monthly' as 'monthly' | 'yearly', renewalDate: '' });
+  const [message, setMessage] = useState('');
 
-  const handleAddCategory = useCallback((newCategory: Category) => {
-    if (newCategory && !categories.includes(newCategory)) {
-        setCategories((prev) => [...prev, newCategory].sort());
+  useEffect(() => {
+    const raw = localStorage.getItem('spendwise_auth');
+    if (!raw) {
+      router.push('/login');
+      return;
     }
-  }, [categories]);
 
-  const handleAddTransaction = useCallback((newTransaction: Omit<Transaction, 'id' | 'date'>) => {
-    const transactionWithIdAndDate: Transaction = {
-      ...newTransaction,
-      id: `txn_${Date.now()}`,
-      date: new Date().toISOString().split('T')[0],
-    };
+    const parsed = JSON.parse(raw);
+    dispatch(hydrateAuth(parsed));
+  }, [dispatch, router]);
 
-    setTransactions((prev) => [transactionWithIdAndDate, ...prev]);
+  useEffect(() => {
+    if (!auth.token) return;
+    dispatch(fetchTransactions());
+    dispatch(fetchSubscriptions());
+    dispatch(fetchSubscriptionInsights());
+    dispatch(fetchAdvice());
+  }, [auth.token, dispatch]);
 
-    setAccounts((prevAccounts) =>
-      prevAccounts.map((acc) => {
-        if (acc.type === 'checking') {
-          const newBalance =
-            newTransaction.type === 'income'
-              ? acc.balance + newTransaction.amount
-              : acc.balance - newTransaction.amount;
-          return { ...acc, balance: newBalance };
-        }
+  const monthlyStats = useMemo(() => {
+    return transactions.reduce(
+      (acc, tx) => {
+        if (tx.type === 'income') acc.income += tx.amount;
+        else acc.expense += tx.amount;
         return acc;
+      },
+      { income: 0, expense: 0 }
+    );
+  }, [transactions]);
+
+  const onAddTransaction = async (event: React.FormEvent) => {
+    event.preventDefault();
+    await dispatch(
+      createTransaction({
+        ...txForm,
+        amount: Number(txForm.amount),
+        date: new Date().toISOString()
       })
     );
-  }, []);
+    setTxForm({ description: '', category: 'General', amount: 0, type: 'expense' });
+  };
 
-  const handleSyncTransactions = useCallback(async () => {
-    setIsSyncing(true);
-    try {
-      const newSyncedTransactions = [
-        { crypticDescription: 'Vending Machine', amount: 3.25 },
-        { crypticDescription: 'TFL.GOV.UK/CP', amount: 12.80 },
-        { crypticDescription: 'AMZN Mktp US', amount: 42.99 },
-      ];
+  const onAddSubscription = async (event: React.FormEvent) => {
+    event.preventDefault();
+    await dispatch(
+      createSubscription({
+        ...subForm,
+        amount: Number(subForm.amount),
+        category: 'General',
+        status: 'active'
+      })
+    );
+    dispatch(fetchSubscriptionInsights());
+    setSubForm({ name: '', amount: 0, billingCycle: 'monthly', renewalDate: '' });
+  };
 
-      const processedTransactions: Transaction[] = [];
-      let totalSyncedExpenses = 0;
-
-      for (const syncedTxn of newSyncedTransactions) {
-        const [clarifiedResult, categoryResult] = await Promise.all([
-          clarifyTransaction({ description: syncedTxn.crypticDescription }),
-          suggestCategory({ description: syncedTxn.crypticDescription, categories }),
-        ]);
-        
-        const newTransaction: Transaction = {
-          id: `sync_${Date.now()}_${Math.random()}`,
-          date: new Date().toISOString().split('T')[0],
-          description: clarifiedResult.clarifiedDescription,
-          category: categoryResult.category || 'Uncategorized',
-          amount: syncedTxn.amount,
-          type: 'expense',
-        };
-        processedTransactions.push(newTransaction);
-        totalSyncedExpenses += newTransaction.amount;
-      }
-      
-      setTransactions((prev) => [...processedTransactions, ...prev]);
-      setAccounts((prevAccounts) =>
-        prevAccounts.map((acc) => {
-          if (acc.type === 'checking') {
-            return { ...acc, balance: acc.balance - totalSyncedExpenses };
-          }
-          return acc;
-        })
-      );
-
-      toast({
-        title: "Sync Complete",
-        description: `${processedTransactions.length} new transactions were added.`,
-      });
-
-    } catch (error) {
-      console.error("Failed to sync transactions:", error);
-      toast({
-        title: "Sync Failed",
-        description: "Could not sync transactions. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSyncing(false);
-    }
-  }, [categories, toast]);
-
+  const onSendMessage = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!message.trim()) return;
+    dispatch(addUserMessage(message));
+    await dispatch(sendChatMessage(message));
+    setMessage('');
+  };
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight font-headline">Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back! Here's your financial overview.</p>
-        </div>
-        <div className="flex w-full sm:w-auto items-center space-x-2">
-          <Button variant="outline" onClick={handleSyncTransactions} disabled={isSyncing} className="w-full sm:w-auto">
-            {isSyncing ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCw className="mr-2 h-4 w-4" />
-            )}
-            Sync with Bank
-          </Button>
-          <AddTransaction 
-            onAddTransaction={handleAddTransaction} 
-            categories={categories}
-            onAddCategory={handleAddCategory} 
-          />
-        </div>
+      <div>
+        <h1 className="font-headline text-3xl font-bold">Finance Command Center</h1>
+        <p className="text-muted-foreground">Track day-to-day transactions, subscriptions, and AI guidance in one place.</p>
       </div>
 
-      <MonthlySummary transactions={transactions} />
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <Card>
+          <CardHeader><CardDescription>Monthly Income</CardDescription><CardTitle>${monthlyStats.income.toFixed(2)}</CardTitle></CardHeader>
+        </Card>
+        <Card>
+          <CardHeader><CardDescription>Monthly Expense</CardDescription><CardTitle>${monthlyStats.expense.toFixed(2)}</CardTitle></CardHeader>
+        </Card>
+        <Card>
+          <CardHeader><CardDescription>Net Savings</CardDescription><CardTitle>${(monthlyStats.income - monthlyStats.expense).toFixed(2)}</CardTitle></CardHeader>
+        </Card>
+        <Card>
+          <CardHeader><CardDescription>Subscriptions / month</CardDescription><CardTitle>${monthlyBurn.toFixed(2)}</CardTitle></CardHeader>
+        </Card>
+      </section>
 
-      <BalanceOverview accounts={accounts} />
+      <section className="grid gap-6 xl:grid-cols-2">
+        <Card>
+          <CardHeader><CardTitle>Add transaction</CardTitle></CardHeader>
+          <CardContent>
+            <form onSubmit={onAddTransaction} className="grid gap-3 sm:grid-cols-2">
+              <div className="sm:col-span-2"><Label>Description</Label><Input value={txForm.description} onChange={(e) => setTxForm((p) => ({ ...p, description: e.target.value }))} required /></div>
+              <div><Label>Category</Label><Input value={txForm.category} onChange={(e) => setTxForm((p) => ({ ...p, category: e.target.value }))} required /></div>
+              <div><Label>Amount</Label><Input type="number" step="0.01" value={txForm.amount} onChange={(e) => setTxForm((p) => ({ ...p, amount: Number(e.target.value) }))} required /></div>
+              <div><Label>Type</Label><select className="w-full rounded-md border bg-background px-3 py-2" value={txForm.type} onChange={(e) => setTxForm((p) => ({ ...p, type: e.target.value as 'income' | 'expense' }))}><option value="expense">Expense</option><option value="income">Income</option></select></div>
+              <div className="sm:col-span-2"><Button type="submit" className="w-full">Save transaction</Button></div>
+            </form>
+          </CardContent>
+        </Card>
 
-      <div className="grid gap-6 lg:grid-cols-5">
-        <div className="lg:col-span-3">
-          <Link href="/dashboard/budgets" className="block h-full rounded-lg transition-all hover:shadow-lg hover:ring-2 hover:ring-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-            <BudgetGoals budgets={budgets} transactions={transactions} />
-          </Link>
-        </div>
-        <div className="lg:col-span-2">
-           <Link href="/dashboard/analysis" className="block h-full rounded-lg transition-all hover:shadow-lg hover:ring-2 hover:ring-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-            <SpendingChart transactions={transactions} />
-          </Link>
-        </div>
-      </div>
+        <Card>
+          <CardHeader><CardTitle>Add subscription</CardTitle></CardHeader>
+          <CardContent>
+            <form onSubmit={onAddSubscription} className="grid gap-3 sm:grid-cols-2">
+              <div className="sm:col-span-2"><Label>Name</Label><Input value={subForm.name} onChange={(e) => setSubForm((p) => ({ ...p, name: e.target.value }))} required /></div>
+              <div><Label>Amount</Label><Input type="number" step="0.01" value={subForm.amount} onChange={(e) => setSubForm((p) => ({ ...p, amount: Number(e.target.value) }))} required /></div>
+              <div><Label>Cycle</Label><select className="w-full rounded-md border bg-background px-3 py-2" value={subForm.billingCycle} onChange={(e) => setSubForm((p) => ({ ...p, billingCycle: e.target.value as 'monthly' | 'yearly' }))}><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select></div>
+              <div className="sm:col-span-2"><Label>Renewal Date</Label><Input type="date" value={subForm.renewalDate} onChange={(e) => setSubForm((p) => ({ ...p, renewalDate: e.target.value }))} required /></div>
+              <div className="sm:col-span-2"><Button type="submit" className="w-full">Save subscription</Button></div>
+            </form>
+          </CardContent>
+        </Card>
+      </section>
 
-      <div className="grid gap-6 lg:grid-cols-5">
-        <div className="lg:col-span-3 h-full">
-          <Link href="/dashboard/records" className="block h-full rounded-lg transition-all hover:shadow-lg hover:ring-2 hover:ring-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-            <RecentTransactions transactions={transactions} />
-          </Link>
-        </div>
-        <div className="lg:col-span-2 space-y-6">
-           <Link href="/dashboard/analysis" className="block rounded-lg transition-all hover:shadow-lg hover:ring-2 hover:ring-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-            <SpendingInsights transactions={transactions} budgets={budgets} />
-          </Link>
-          <DailyReminder />
-        </div>
-      </div>
+      <section className="grid gap-6 xl:grid-cols-3">
+        <Card className="xl:col-span-2">
+          <CardHeader><CardTitle>Recent transactions</CardTitle></CardHeader>
+          <CardContent className="space-y-2">
+            {transactions.slice(0, 8).map((tx) => (
+              <div key={tx._id} className="flex items-center justify-between rounded-lg border p-3 text-sm">
+                <div>
+                  <p className="font-medium">{tx.description}</p>
+                  <p className="text-muted-foreground">{tx.category}</p>
+                </div>
+                <span className={tx.type === 'income' ? 'text-green-600' : 'text-red-600'}>
+                  {tx.type === 'income' ? '+' : '-'}${tx.amount.toFixed(2)}
+                </span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader><CardTitle>Active subscriptions</CardTitle></CardHeader>
+          <CardContent className="space-y-2">
+            {subscriptions.slice(0, 8).map((sub) => (
+              <div key={sub._id} className="rounded-lg border p-3 text-sm">
+                <p className="font-medium">{sub.name}</p>
+                <p className="text-muted-foreground">${sub.amount.toFixed(2)} / {sub.billingCycle}</p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-2">
+        <Card>
+          <CardHeader><CardTitle>AI financial advice</CardTitle></CardHeader>
+          <CardContent>
+            <pre className="whitespace-pre-wrap text-sm text-muted-foreground">{ai.advice || 'Loading advice...'}</pre>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader><CardTitle>Chat with finance agent</CardTitle></CardHeader>
+          <CardContent className="space-y-3">
+            <div className="max-h-48 space-y-2 overflow-y-auto rounded-md border p-3">
+              {ai.chat.map((item, index) => (
+                <p key={`${item.role}-${index}`} className="text-sm"><strong>{item.role === 'user' ? 'You' : 'Agent'}:</strong> {item.text}</p>
+              ))}
+            </div>
+            <form onSubmit={onSendMessage} className="flex gap-2">
+              <Input placeholder="Ask for budget optimization..." value={message} onChange={(e) => setMessage(e.target.value)} />
+              <Button type="submit">Send</Button>
+            </form>
+          </CardContent>
+        </Card>
+      </section>
     </div>
   );
 }
